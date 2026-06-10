@@ -1,0 +1,30 @@
+# Maven
+target/
+
+# Eclipse
+.project
+.classpath
+.settings/
+
+# STS
+.apt_generated/
+.factorypath
+.springBeans
+.sts4-cache/
+
+# IntelliJ
+.idea/
+*.iml
+
+# VS Code
+.vscode/
+
+# Logs
+*.log
+
+# Environment files
+.env
+
+# OS files
+.DS_Store
+Thumbs.db
