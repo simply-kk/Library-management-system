@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.PageFlow.entity.Book;
@@ -156,7 +157,6 @@ public class BookService {
 	public List<Book> searchBooksByCategory(String category) {
 
 		List<Book> books = bookRepository.findByCategoryContainingIgnoreCase(category);
-
 		if (books.isEmpty()) {
 			throw new NoRecordAvailableException("No books found with Category: " + category);
 		}
@@ -168,11 +168,9 @@ public class BookService {
 	public List<Book> searchBooksByAuthor(String author) {
 
 		List<Book> books = bookRepository.findByAuthorContainingIgnoreCase(author);
-
 		if (books.isEmpty()) {
 			throw new NoRecordAvailableException("No books found with Author: " + author);
 		}
-
 		return books;
 	}
 
@@ -182,12 +180,40 @@ public class BookService {
 		if (pageNumber < 0) {
 			throw new IllegalArgumentException("Page number cannot be negative");
 		}
+		if (pageSize <= 0) {
+			throw new IllegalArgumentException("Page size must be greater than 0");
+		}
+		Page<Book> pages = bookRepository.findAll(PageRequest.of(pageNumber, pageSize));
 
+		if (pages.isEmpty()) {
+			throw new NoRecordAvailableException("No records found on page " + pageNumber);
+		}
+		return pages;
+	}
+
+	// sorting with pagination
+	public Page<Book> getBooksByPaginationAndSorting(int pageNumber, int pageSize, String sortBy, String direction) {
+
+		if (pageNumber < 0) {
+			throw new IllegalArgumentException("Page number cannot be negative");
+		}
 		if (pageSize <= 0) {
 			throw new IllegalArgumentException("Page size must be greater than 0");
 		}
 
-		Page<Book> pages = bookRepository.findAll(PageRequest.of(pageNumber, pageSize));
+		if (!direction.equalsIgnoreCase("asc") && !direction.equalsIgnoreCase("desc")) {
+			throw new IllegalArgumentException("Direction must be asc or desc");
+		}
+
+		List<String> validFields = List.of("id", "title", "author", "category", "totalCopies", "availableCopies",
+				"createdAt", "updatedAt");
+
+		if (!validFields.contains(sortBy)) {
+			throw new IllegalArgumentException("Invalid sort field");
+		}
+		Sort sort = direction.equalsIgnoreCase("desc") ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
+
+		Page<Book> pages = bookRepository.findAll(PageRequest.of(pageNumber, pageSize, sort));
 
 		if (pages.isEmpty()) {
 			throw new NoRecordAvailableException("No records found on page " + pageNumber);

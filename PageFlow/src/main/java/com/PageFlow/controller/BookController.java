@@ -181,4 +181,21 @@ public class BookController {
 		return new ResponseEntity<>(res, HttpStatus.OK);
 	}
 
+	// sorting with pagination
+	@GetMapping("/page-sort")
+	public ResponseEntity<ResponseStructure<Page<Book>>> getBooksByPaginationAndSorting(
+			@RequestParam(defaultValue = "0") int pageNumber, @RequestParam(defaultValue = "5") int pageSize,
+			@RequestParam(defaultValue = "id") String sortBy, @RequestParam(defaultValue = "asc") String direction) {
+
+		ResponseStructure<Page<Book>> res = new ResponseStructure<>();
+
+		res.setStatusCode(HttpStatus.OK.value());
+		res.setMessage("Books sorted by " + sortBy.toUpperCase() + " in " + direction.toUpperCase()
+				+ " order and retrieved successfully");
+
+		res.setData(bookService.getBooksByPaginationAndSorting(pageNumber, pageSize, sortBy, direction));
+
+		return new ResponseEntity<>(res, HttpStatus.OK);
+	}
+
 }
