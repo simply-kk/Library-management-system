@@ -103,6 +103,7 @@ public class BookController {
 
 	// Multiple Delete at Once (Using Query Parameters)
 	// URL Target: http://localhost:8080/api/books/batch?ids=1,2,3
+	// In this still need some improvement
 	@DeleteMapping("/batch")
 	public ResponseEntity<ResponseStructure<String>> deleteMultipleBooks(@RequestParam List<Integer> ids) {
 		ResponseStructure<String> res = new ResponseStructure<>();
@@ -122,6 +123,45 @@ public class BookController {
 		res.setStatusCode(HttpStatus.OK.value()); // 200
 		res.setMessage("Global deletion processing complete");
 		res.setData(bookService.deleteAllBooks());
+
+		return new ResponseEntity<>(res, HttpStatus.OK);
+	}
+
+	// Search books by title
+	@GetMapping("/search/title")
+	public ResponseEntity<ResponseStructure<List<Book>>> searchBooksByTitle(@RequestParam String title) {
+
+		ResponseStructure<List<Book>> res = new ResponseStructure<>();
+
+		res.setStatusCode(HttpStatus.OK.value());
+		res.setMessage("Books fetched by title");
+		res.setData(bookService.searchBooksByTitle(title));
+
+		return new ResponseEntity<>(res, HttpStatus.OK);
+	}
+
+	// Search books by Author
+	@GetMapping("/search/author")
+	public ResponseEntity<ResponseStructure<List<Book>>> searchBooksByAuthor(@RequestParam String author) {
+
+		ResponseStructure<List<Book>> res = new ResponseStructure<>();
+
+		res.setStatusCode(HttpStatus.OK.value());
+		res.setMessage("Books fetched by Author");
+		res.setData(bookService.searchBooksByAuthor(author));
+
+		return new ResponseEntity<>(res, HttpStatus.OK);
+	}
+
+	// Search books by category
+	@GetMapping("/search/category")
+	public ResponseEntity<ResponseStructure<List<Book>>> searchBooksByCategory(@RequestParam String category) {
+
+		ResponseStructure<List<Book>> res = new ResponseStructure<>();
+
+		res.setStatusCode(HttpStatus.OK.value());
+		res.setMessage("Books fetched by Category");
+		res.setData(bookService.searchBooksByCategory(category));
 
 		return new ResponseEntity<>(res, HttpStatus.OK);
 	}

@@ -138,4 +138,40 @@ public class BookService {
 		return "All book records have been deleted cleanly from the library database.";
 	}
 
+	// search books by title
+	public List<Book> searchBooksByTitle(String title) {
+
+		List<Book> books = bookRepository.findByTitleContainingIgnoreCase(title);
+
+		if (books.isEmpty()) {
+			throw new NoRecordAvailableException("No books found with title: " + title);
+		}
+
+		return books;
+	}
+
+	// search books by category
+	public List<Book> searchBooksByCategory(String category) {
+
+		List<Book> books = bookRepository.findByCategoryContainingIgnoreCase(category);
+
+		if (books.isEmpty()) {
+			throw new NoRecordAvailableException("No books found with Category: " + category);
+		}
+
+		return books;
+	}
+
+	// search books by author
+	public List<Book> searchBooksByAuthor(String author) {
+
+		List<Book> books = bookRepository.findByAuthorContainingIgnoreCase(author);
+
+		if (books.isEmpty()) {
+			throw new NoRecordAvailableException("No books found with Author: " + author);
+		}
+
+		return books;
+	}
+
 }
