@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import com.PageFlow.entity.Book;
@@ -172,6 +174,26 @@ public class BookService {
 		}
 
 		return books;
+	}
+
+	// pagination
+	public Page<Book> getBookByPagination(int pageNumber, int pageSize) {
+
+		if (pageNumber < 0) {
+			throw new IllegalArgumentException("Page number cannot be negative");
+		}
+
+		if (pageSize <= 0) {
+			throw new IllegalArgumentException("Page size must be greater than 0");
+		}
+
+		Page<Book> pages = bookRepository.findAll(PageRequest.of(pageNumber, pageSize));
+
+		if (pages.isEmpty()) {
+			throw new NoRecordAvailableException("No records found on page " + pageNumber);
+		}
+
+		return pages;
 	}
 
 }

@@ -3,6 +3,7 @@ package com.PageFlow.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -162,6 +163,20 @@ public class BookController {
 		res.setStatusCode(HttpStatus.OK.value());
 		res.setMessage("Books fetched by Category");
 		res.setData(bookService.searchBooksByCategory(category));
+
+		return new ResponseEntity<>(res, HttpStatus.OK);
+	}
+
+	// Pagination
+	@GetMapping("/page")
+	public ResponseEntity<ResponseStructure<Page<Book>>> getBooksByPagination(
+			@RequestParam(defaultValue = "0") int pageNumber, @RequestParam(defaultValue = "5") int pageSize) {
+
+		ResponseStructure<Page<Book>> res = new ResponseStructure<>();
+
+		res.setStatusCode(HttpStatus.OK.value());
+		res.setMessage("Book records retrieved by pagination");
+		res.setData(bookService.getBookByPagination(pageNumber, pageSize));
 
 		return new ResponseEntity<>(res, HttpStatus.OK);
 	}
