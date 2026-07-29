@@ -10,7 +10,9 @@ import com.PageFlow.entity.Book;
 import com.PageFlow.entity.IssueRecord;
 import com.PageFlow.entity.Student;
 import com.PageFlow.enums.IssueStatus;
+import com.PageFlow.exception.BookAlreadyIssuedException;
 import com.PageFlow.exception.BookAlreadyReturnedException;
+import com.PageFlow.exception.BookNotAvailableException;
 import com.PageFlow.exception.IdNotFoundException;
 import com.PageFlow.repository.BookRepository;
 import com.PageFlow.repository.IssueRecordRepository;
@@ -30,47 +32,63 @@ public class IssueRecordService {
 	@Autowired
 	private BookRepository bookRepository;
 
-	// for issuing book
-	// abhi ismai ek problem hai jab mai ek book issue kar raha hun to student ka
-	// current issue randomly badh raha hai
-
-	@Transactional
+	@Transactional // Ensures all database operations succeed together or rollBack 
 	public IssueRecord issueBook(IssueBookRequest request) {
 
-		// checking student is available or not
+		// Fetch the student from the database.
+		// If the given student ID does not exist, stop the operation.
 		Student student = studentRepository.findById(request.getStudentId())
-				.orElseThrow(() -> new IdNotFoundException("Student with ID " + request.getStudentId() + " not found"));
+				.orElseThrow(() -> new IdNotFoundException(
+						"Student with ID " + request.getStudentId() + " not found"));
 
-		// checking book is available or not
+		// Fetch the book from the database.
+		// If the given book ID does not exist, stop the operation.
 		Book book = bookRepository.findById(request.getBookId())
-				.orElseThrow(() -> new IdNotFoundException("Book with ID " + request.getBookId() + " not found"));
+				.orElseThrow(() -> new IdNotFoundException(
+						"Book with ID " + request.getBookId() + " not found"));
 
-		// availability of books
+		// A book can only be issued if at least one copy is available.
 		if (book.getAvailableCopies() <= 0) {
-			throw new IllegalArgumentException("Book is currently not available for issue");
+			throw new BookNotAvailableException(
+					"Book is currently not available for issue.");
 		}
 
-		// check if already issue book to same student
-		if (issueRecordRepository.existsByStudentIdAndBookIdAndStatus(student.getId(), book.getId(),
-				IssueStatus.ISSUED)) {
-			throw new IllegalArgumentException("This student has already issued this book.");
-		} else {
+		// Prevent the same student from issuing the same book multiple times
+		// until the previous copy has been returned.
+		if (issueRecordRepository.existsByStudentIdAndBookIdAndStatus(
+				student.getId(), book.getId(), IssueStatus.ISSUED)) {
 
-			// issue book
-			IssueRecord issueRecord = new IssueRecord();
-			issueRecord.setStudent(student);
-			issueRecord.setBook(book);
-
-			book.setAvailableCopies(book.getAvailableCopies() - 1);
-			student.setCurrentIssuedBooks(book.getAvailableCopies() + 1);
-
-			// save and this is Following acid property save all or none
-			issueRecordRepository.save(issueRecord);
-			bookRepository.save(book);
-			studentRepository.save(student);
-
-			return issueRecord;
+			throw new BookAlreadyIssuedException(
+					"This student has already issued this book.");
 		}
+
+		// Create a new issue transaction record.
+		IssueRecord issueRecord = new IssueRecord();
+
+		// Associate the student and book with this transaction.
+		issueRecord.setStudent(student);
+		issueRecord.setBook(book);
+
+		// Store issue details.
+		issueRecord.setIssueDate(LocalDate.now());
+		issueRecord.setDueDate(LocalDate.now().plusDays(7));
+		issueRecord.setStatus(IssueStatus.ISSUED);
+
+		// Update book inventory after successful issue.
+		book.setAvailableCopies(book.getAvailableCopies() - 1);
+
+		// Increase the student's current issued book count.
+		student.setCurrentIssuedBooks(
+				student.getCurrentIssuedBooks() + 1);
+
+		// Save all changes.
+		// Because of @Transactional, either all three records are saved
+		// successfully or none of them are saved.
+		issueRecordRepository.save(issueRecord);
+		bookRepository.save(book);
+		studentRepository.save(student);
+
+		return issueRecord;
 	}
 
 	@Transactional

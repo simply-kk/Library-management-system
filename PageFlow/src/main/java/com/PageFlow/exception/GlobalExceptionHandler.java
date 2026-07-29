@@ -39,8 +39,8 @@ public class GlobalExceptionHandler {
 	}
 
 	// ===========================================================
-	// BUSINESS EXCEPTIONS (400 Bad Request)
-	// Thrown when a business rule is violated
+	// BOOK ALREADY RETURNED (400 Bad Request)
+	// Thrown when attempting to return an already returned book
 	// ===========================================================
 
 	@ExceptionHandler(BookAlreadyReturnedException.class)
@@ -57,12 +57,46 @@ public class GlobalExceptionHandler {
 	}
 
 	// ===========================================================
+	// BOOK NOT AVAILABLE (400 Bad Request)
+	// Thrown when no copies of the requested book are available
+	// ===========================================================
+
+	@ExceptionHandler(BookNotAvailableException.class)
+	public ResponseEntity<ResponseStructure<String>> handleBookNotAvailableException(BookNotAvailableException ex) {
+
+		ResponseStructure<String> response = new ResponseStructure<>();
+
+		response.setStatusCode(HttpStatus.BAD_REQUEST.value());
+		response.setMessage("Book issue operation failed.");
+		response.setData(ex.getMessage());
+
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+	}
+
+	// ===========================================================
+	// BOOK ALREADY ISSUED (400 Bad Request)
+	// Thrown when a student tries to issue the same book again
+	// before returning it
+	// ===========================================================
+
+	@ExceptionHandler(BookAlreadyIssuedException.class)
+	public ResponseEntity<ResponseStructure<String>> handleBookAlreadyIssuedException(BookAlreadyIssuedException ex) {
+
+		ResponseStructure<String> response = new ResponseStructure<>();
+
+		response.setStatusCode(HttpStatus.BAD_REQUEST.value());
+		response.setMessage("Book issue operation failed.");
+		response.setData(ex.getMessage());
+
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+	}
+
+	// ===========================================================
 	// RESOURCE NOT FOUND EXCEPTIONS (404 Not Found)
 	// ===========================================================
 
 	@ExceptionHandler(IdNotFoundException.class)
-	public ResponseEntity<ResponseStructure<Void>> handleIdNotFoundException(
-			IdNotFoundException ex) {
+	public ResponseEntity<ResponseStructure<Void>> handleIdNotFoundException(IdNotFoundException ex) {
 
 		ResponseStructure<Void> response = new ResponseStructure<>();
 
@@ -74,8 +108,7 @@ public class GlobalExceptionHandler {
 	}
 
 	@ExceptionHandler(NoRecordAvailableException.class)
-	public ResponseEntity<ResponseStructure<Void>> handleNoRecordAvailableException(
-			NoRecordAvailableException ex) {
+	public ResponseEntity<ResponseStructure<Void>> handleNoRecordAvailableException(NoRecordAvailableException ex) {
 
 		ResponseStructure<Void> response = new ResponseStructure<>();
 
@@ -92,8 +125,7 @@ public class GlobalExceptionHandler {
 	// ===========================================================
 
 	@ExceptionHandler(Exception.class)
-	public ResponseEntity<ResponseStructure<Void>> handleGlobalException(
-			Exception ex) {
+	public ResponseEntity<ResponseStructure<Void>> handleGlobalException(Exception ex) {
 
 		ResponseStructure<Void> response = new ResponseStructure<>();
 
@@ -101,9 +133,7 @@ public class GlobalExceptionHandler {
 		response.setMessage("An unexpected error occurred.");
 		response.setData(null);
 
-		return ResponseEntity
-				.status(HttpStatus.INTERNAL_SERVER_ERROR)
-				.body(response);
+		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
 	}
 
 }
