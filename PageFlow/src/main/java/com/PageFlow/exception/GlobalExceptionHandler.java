@@ -14,32 +14,11 @@ import com.PageFlow.dto.ResponseStructure;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-	// ************** HANDLE ID NOT FOUND **************
-	@ExceptionHandler(IdNotFoundException.class)
-	public ResponseEntity<ResponseStructure<Void>> handleIdNotFoundException(IdNotFoundException exception) {
-		ResponseStructure<Void> res = new ResponseStructure<>();
+	// ===========================================================
+	// VALIDATION EXCEPTIONS (400 Bad Request)
+	// Handles @Valid annotation failures
+	// ===========================================================
 
-		res.setStatusCode(HttpStatus.NOT_FOUND.value()); // 404
-		res.setMessage(exception.getMessage());
-		res.setData(null); // Clean and standardized for missing data
-
-		return new ResponseEntity<>(res, HttpStatus.NOT_FOUND);
-	}
-
-	// ************** HANDLE NO RECORD AVAILABLE **************
-	@ExceptionHandler(NoRecordAvailableException.class)
-	public ResponseEntity<ResponseStructure<Void>> handleNoRecordAvailableException(
-			NoRecordAvailableException exception) {
-		ResponseStructure<Void> res = new ResponseStructure<>();
-
-		res.setStatusCode(HttpStatus.NOT_FOUND.value()); // 404
-		res.setMessage(exception.getMessage());
-		res.setData(null);
-
-		return new ResponseEntity<>(res, HttpStatus.NOT_FOUND);
-	}
-
-	// ****************** VALIDATION EXCEPTION ************************
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	public ResponseEntity<ResponseStructure<Map<String, String>>> handleValidationException(
 			MethodArgumentNotValidException ex) {
@@ -50,24 +29,81 @@ public class GlobalExceptionHandler {
 			errors.put(error.getField(), error.getDefaultMessage());
 		});
 
-		ResponseStructure<Map<String, String>> res = new ResponseStructure<>();
-		res.setStatusCode(HttpStatus.BAD_REQUEST.value()); // 400
-		res.setMessage("Validation failed");
-		res.setData(errors);
+		ResponseStructure<Map<String, String>> response = new ResponseStructure<>();
 
-		return new ResponseEntity<>(res, HttpStatus.BAD_REQUEST);
+		response.setStatusCode(HttpStatus.BAD_REQUEST.value());
+		response.setMessage("Validation failed.");
+		response.setData(errors);
+
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
 	}
 
-	// ************** CATCH-ALL SAFETY NET (500 Internal Server Error)
-	// **************
+	// ===========================================================
+	// BUSINESS EXCEPTIONS (400 Bad Request)
+	// Thrown when a business rule is violated
+	// ===========================================================
+
+	@ExceptionHandler(BookAlreadyReturnedException.class)
+	public ResponseEntity<ResponseStructure<String>> handleBookAlreadyReturnedException(
+			BookAlreadyReturnedException ex) {
+
+		ResponseStructure<String> response = new ResponseStructure<>();
+
+		response.setStatusCode(HttpStatus.BAD_REQUEST.value());
+		response.setMessage("Book return operation failed.");
+		response.setData(ex.getMessage());
+
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+	}
+
+	// ===========================================================
+	// RESOURCE NOT FOUND EXCEPTIONS (404 Not Found)
+	// ===========================================================
+
+	@ExceptionHandler(IdNotFoundException.class)
+	public ResponseEntity<ResponseStructure<Void>> handleIdNotFoundException(
+			IdNotFoundException ex) {
+
+		ResponseStructure<Void> response = new ResponseStructure<>();
+
+		response.setStatusCode(HttpStatus.NOT_FOUND.value());
+		response.setMessage(ex.getMessage());
+		response.setData(null);
+
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+	}
+
+	@ExceptionHandler(NoRecordAvailableException.class)
+	public ResponseEntity<ResponseStructure<Void>> handleNoRecordAvailableException(
+			NoRecordAvailableException ex) {
+
+		ResponseStructure<Void> response = new ResponseStructure<>();
+
+		response.setStatusCode(HttpStatus.NOT_FOUND.value());
+		response.setMessage(ex.getMessage());
+		response.setData(null);
+
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+	}
+
+	// ===========================================================
+	// GLOBAL EXCEPTION HANDLER (500 Internal Server Error)
+	// Handles any unexpected exception not caught above
+	// ===========================================================
+
 	@ExceptionHandler(Exception.class)
-	public ResponseEntity<ResponseStructure<Void>> handleGlobalException(Exception exception) {
-		ResponseStructure<Void> res = new ResponseStructure<>();
+	public ResponseEntity<ResponseStructure<Void>> handleGlobalException(
+			Exception ex) {
 
-		res.setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR.value()); // 500
-		res.setMessage("An unexpected error occurred: " + exception.getMessage());
-		res.setData(null);
+		ResponseStructure<Void> response = new ResponseStructure<>();
 
-		return new ResponseEntity<>(res, HttpStatus.INTERNAL_SERVER_ERROR);
+		response.setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+		response.setMessage("An unexpected error occurred.");
+		response.setData(null);
+
+		return ResponseEntity
+				.status(HttpStatus.INTERNAL_SERVER_ERROR)
+				.body(response);
 	}
+
 }

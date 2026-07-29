@@ -14,7 +14,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 
 @Entity
-public class IssuedRecord {
+public class IssueRecord {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

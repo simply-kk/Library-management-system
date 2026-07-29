@@ -1,9 +1,14 @@
 package com.PageFlow.dto;
 
+import jakarta.validation.constraints.NotNull;
+
 public class IssueBookRequest {
 
+	
+    @NotNull(message = "Student ID is required")
 	private Integer studentId;
 
+    @NotNull(message = "Book ID is required")
 	private Integer bookId;
 
 	public Integer getStudentId() {
