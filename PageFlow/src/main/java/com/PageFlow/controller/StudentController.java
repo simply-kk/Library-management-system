@@ -81,19 +81,12 @@ public class StudentController {
 	public ResponseEntity<ResponseStructure<String>> deleteStudent(@PathVariable Integer id) {
 		ResponseStructure<String> res = new ResponseStructure<>();
 
-		
-		  res.setStatusCode(HttpStatus.OK.value()); // 200
-		  res.setMessage("Student deletion completed");
-		  res.setData(studentService.deleteStudentById(id));
-		  
-		  return new ResponseEntity<>(res, HttpStatus.OK);
-		 
-		
-		
-		
-		
-		
-		
+		res.setStatusCode(HttpStatus.OK.value()); // 200
+		res.setMessage("Student deletion completed");
+		res.setData(studentService.deleteStudentById(id));
+
+		return new ResponseEntity<>(res, HttpStatus.OK);
+
 	}
 
 }
