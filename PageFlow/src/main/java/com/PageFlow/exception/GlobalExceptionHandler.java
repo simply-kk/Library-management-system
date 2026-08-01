@@ -119,6 +119,17 @@ public class GlobalExceptionHandler {
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
 	}
 
+	@ExceptionHandler(BookAlreadyExistsException.class)
+	public ResponseEntity<ResponseStructure<String>> handleBookAlreadyExistsException(BookAlreadyExistsException ex) {
+
+		ResponseStructure<String> response = new ResponseStructure<>();
+		response.setStatusCode(HttpStatus.CONFLICT.value());
+		response.setMessage("Book Already Exists");
+		response.setData(ex.getMessage());
+
+		return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+	}
+
 	// ===========================================================
 	// GLOBAL EXCEPTION HANDLER (500 Internal Server Error)
 	// Handles any unexpected exception not caught above

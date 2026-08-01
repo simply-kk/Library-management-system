@@ -1,14 +1,22 @@
 package com.PageFlow.service;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.PageFlow.dto.CsvImportResponse;
 import com.PageFlow.entity.Book;
 import com.PageFlow.exception.IdNotFoundException;
 import com.PageFlow.exception.NoRecordAvailableException;
@@ -36,6 +44,81 @@ public class BookService {
 		validateBook(book);
 
 		return bookRepository.save(book);
+	}
+
+	// import csv book file
+	public CsvImportResponse importBooks(MultipartFile file) {
+		// response structure
+		CsvImportResponse response = new CsvImportResponse();
+
+		response.setImportedCount(0);
+		response.setSkippedCount(0);
+		response.setErrors(new ArrayList<>());
+
+		// 1. Validate uploaded file
+		String fileName = file.getOriginalFilename();
+
+		if (fileName == null || !fileName.toLowerCase().endsWith(".csv")) {
+		    throw new IllegalArgumentException("Only CSV files are allowed.");
+		}
+
+		try (
+
+				// 2. Read CSV file
+				BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream()));
+
+				// 3. Create CSV parser
+				CSVParser csvParser = CSVFormat.DEFAULT.builder().setHeader().setSkipHeaderRecord(true).build()
+						.parse(reader);
+
+		) {
+
+			// 4. Read every row
+			for (CSVRecord record : csvParser) {
+
+				try {
+
+					// 5. Read values from current CSV row
+					String title = record.get("title");
+					String author = record.get("author");
+					String isbn = record.get("isbn");
+					String category = record.get("category");
+					Integer totalCopies = Integer.parseInt(record.get("totalCopies"));
+
+					// 6. Create Book object
+					Book book = new Book();
+
+					book.setTitle(title);
+					book.setAuthor(author);
+					book.setIsbn(isbn);
+					book.setCategory(category);
+					book.setTotalCopies(totalCopies);
+					book.setAvailableCopies(totalCopies);
+
+					// 7. Validate
+					validateBook(book);
+
+					// 8. Save
+					bookRepository.save(book);
+
+					// Increase imported count
+					response.setImportedCount(response.getImportedCount() + 1);
+
+				} catch (Exception e) {
+					// Increase skipped count
+					response.setSkippedCount(response.getSkippedCount() + 1);
+
+					// Store error message
+					response.getErrors().add("Row " + record.getRecordNumber() + " failed: " + e.getMessage());
+				}
+			}
+
+		} catch (IOException e) {
+			throw new RuntimeException("Failed to read CSV file.", e);
+		}
+
+		// 10. Return success message
+		return response;
 	}
 
 	// insert in batch

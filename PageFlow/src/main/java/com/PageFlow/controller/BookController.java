@@ -15,7 +15,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.PageFlow.dto.CsvImportResponse;
 import com.PageFlow.dto.ResponseStructure;
 import com.PageFlow.entity.Book;
 import com.PageFlow.service.BookService;
@@ -38,6 +40,19 @@ public class BookController {
 		res.setData(bookService.saveBook(book));
 
 		return new ResponseEntity<>(res, HttpStatus.CREATED);
+	}
+
+	// Import books from CSV file
+	@PostMapping("/import")
+	public ResponseEntity<ResponseStructure<CsvImportResponse>> importBooks(@RequestParam("file") MultipartFile file) {
+
+		ResponseStructure<CsvImportResponse> res = new ResponseStructure<>();
+
+		res.setStatusCode(HttpStatus.OK.value());
+		res.setMessage("CSV import completed.");
+		res.setData(bookService.importBooks(file));
+
+		return new ResponseEntity<>(res, HttpStatus.OK);
 	}
 
 //	Insert multiple data/batch
