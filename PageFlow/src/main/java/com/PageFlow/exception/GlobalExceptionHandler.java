@@ -72,6 +72,43 @@ public class GlobalExceptionHandler {
 
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
 	}
+	
+	
+	// ===========================================================
+	// STUDENT EMAIL ALREADY EXISTS (409 Conflict)
+	// Thrown when a student with the same email already exists
+	// ===========================================================
+
+	@ExceptionHandler(StudentEmailAlreadyExistsException.class)
+	public ResponseEntity<ResponseStructure<String>> handleStudentEmailAlreadyExistsException(
+			StudentEmailAlreadyExistsException ex) {
+
+		ResponseStructure<String> response = new ResponseStructure<>();
+
+		response.setStatusCode(HttpStatus.CONFLICT.value());
+		response.setMessage("Student Email Already Exists");
+		response.setData(ex.getMessage());
+
+		return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+	}
+
+	// ===========================================================
+	// STUDENT ROLL NUMBER ALREADY EXISTS (409 Conflict)
+	// Thrown when a student with the same roll number already exists
+	// ===========================================================
+
+	@ExceptionHandler(StudentRollNumberAlreadyExistsException.class)
+	public ResponseEntity<ResponseStructure<String>> handleStudentRollNumberAlreadyExistsException(
+			StudentRollNumberAlreadyExistsException ex) {
+
+		ResponseStructure<String> response = new ResponseStructure<>();
+
+		response.setStatusCode(HttpStatus.CONFLICT.value());
+		response.setMessage("Student Roll Number Already Exists");
+		response.setData(ex.getMessage());
+
+		return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+	}
 
 	// ===========================================================
 	// BOOK ALREADY ISSUED (400 Bad Request)

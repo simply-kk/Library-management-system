@@ -12,8 +12,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.PageFlow.dto.CsvImportResponse;
 import com.PageFlow.dto.ResponseStructure;
 import com.PageFlow.entity.Student;
 import com.PageFlow.service.StudentService;
@@ -36,6 +39,20 @@ public class StudentController {
 		res.setData(studentService.saveStudent(student));
 
 		return ResponseEntity.status(HttpStatus.CREATED).body(res);
+	}
+
+	// Import students from CSV file
+	@PostMapping("/import")
+	public ResponseEntity<ResponseStructure<CsvImportResponse>> importStudents(
+			@RequestParam("file") MultipartFile file) {
+
+		ResponseStructure<CsvImportResponse> res = new ResponseStructure<>();
+
+		res.setStatusCode(HttpStatus.OK.value());
+		res.setMessage("CSV import completed.");
+		res.setData(studentService.importStudents(file));
+
+		return new ResponseEntity<>(res, HttpStatus.OK);
 	}
 
 	// fetch all student
