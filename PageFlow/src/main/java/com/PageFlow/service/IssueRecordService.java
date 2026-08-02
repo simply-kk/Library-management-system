@@ -34,6 +34,50 @@ public class IssueRecordService {
 	@Autowired
 	private BookRepository bookRepository;
 
+	@Autowired
+	private EmailService emailService;
+
+	// creating body of email issue
+	private String buildIssueEmail(Student student, Book book, IssueRecord issueRecord) {
+
+		return """
+				Hello %s,
+
+				Your book has been issued successfully.
+
+				Book Title : %s
+				Author     : %s
+
+				Issue Date : %s
+				Due Date   : %s
+
+				Please return the book on or before the due date.
+
+				Thank you for using PageFlow.
+				""".formatted(student.getName(), book.getTitle(), book.getAuthor(), issueRecord.getIssueDate(),
+				issueRecord.getDueDate());
+	}
+
+	// creating body of email for return
+	private String buildReturnEmail(Student student, Book book, IssueRecord issueRecord) {
+
+		return """
+				Hello %s,
+
+				Your book has been returned successfully.
+
+				Book Title : %s
+				Author     : %s
+
+				Return Date: %s
+
+				Thank you for returning the book.
+
+				Regards,
+				PageFlow Library
+				""".formatted(student.getName(), book.getTitle(), book.getAuthor(), issueRecord.getReturnDate());
+	}
+
 	@Transactional // Ensures all database operations succeed together or rollBack
 	public IssueRecord issueBook(IssueBookRequest request) {
 
@@ -85,6 +129,10 @@ public class IssueRecordService {
 		bookRepository.save(book);
 		studentRepository.save(student);
 
+		// sending confirmation email
+		String body = buildIssueEmail(student, book, issueRecord);
+		emailService.sendEmail(student.getEmail(), "Book Issued Successfully", body);
+
 		return issueRecord;
 	}
 
@@ -114,6 +162,10 @@ public class IssueRecordService {
 		issueRecordRepository.save(issueRecord);
 		bookRepository.save(book);
 		studentRepository.save(student);
+
+		// sending mail
+		String body = buildReturnEmail(student, book, issueRecord);
+		emailService.sendEmail(student.getEmail(), "Book Returned Successfully", body);
 
 		return issueRecord;
 	}
