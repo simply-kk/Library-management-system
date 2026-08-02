@@ -38,7 +38,7 @@ public class StudentController {
 		res.setMessage("Student record saved");
 		res.setData(studentService.saveStudent(student));
 
-		return ResponseEntity.status(HttpStatus.CREATED).body(res);
+		return new ResponseEntity<>(res, HttpStatus.CREATED);
 	}
 
 	// Import students from CSV file
