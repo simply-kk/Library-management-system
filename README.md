@@ -1,6 +1,6 @@
 # 📚 PageFlow - Library Management System
 
-A full-stack backend Library Management System built using **Spring Boot**, **Spring Data JPA**, and **MySQL**. The project automates library operations such as book management, student management, book issue/return, CSV imports, and email notifications.
+A full-stack backend Library Management System built using **Spring Boot**, **Spring Data JPA**, and **PostgreSQL**. The project automates library operations such as book management, student management, book issue/return, CSV imports, and email notifications.
 
 ## 🚀 Features
 
@@ -72,7 +72,7 @@ A full-stack backend Library Management System built using **Spring Boot**, **Sp
 * Spring Boot
 * Spring Data JPA
 * Hibernate
-* MySQL
+* PostgreSQL
 * Maven
 * Apache Commons CSV
 * Java Mail Sender
