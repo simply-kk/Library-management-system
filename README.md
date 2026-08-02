@@ -82,17 +82,53 @@ A full-stack backend Library Management System built using **Spring Boot**, **Sp
 
 ## 📂 Project Structure
 
-```
-Controller
-      ↓
-Service
-      ↓
-Repository
-      ↓
-Database
+```text
+PageFlow
+│
+├── controller
+│   ├── BookController
+│   ├── StudentController
+│   ├── IssueRecordController
+│
+├── service
+│   ├── BookService
+│   ├── StudentService
+│   ├── IssueRecordService
+│   ├── EmailService
+│
+├── repository
+│   ├── BookRepository
+│   ├── StudentRepository
+│   ├── IssueRecordRepository
+│
+├── entity
+│   ├── Book
+│   ├── Student
+│   ├── IssueRecord
+│
+├── dto
+│   ├── ResponseStructure
+│   ├── CsvImportResponse
+│   ├── IssueBookRequest
+│
+├── exception
+│   ├── GlobalExceptionHandler
+│   ├── BookAlreadyExistsException
+│   ├── BookAlreadyIssuedException
+│   ├── BookAlreadyReturnedException
+│   ├── BookNotAvailableException
+│   ├── IdNotFoundException
+│   ├── NoRecordAvailableException
+│
+├── enums
+│   └── IssueStatus
+│
+├── scheduler
+│   └── DueDateReminderScheduler (Upcoming)
+│
+└── PageFlowApplication
 ```
 
----
 
 ## 🔄 Upcoming Features
 
