@@ -91,6 +91,33 @@ public class GlobalExceptionHandler {
 
 		return new ResponseEntity<>(response, HttpStatus.CONFLICT);
 	}
+	
+	// for auth
+	@ExceptionHandler(UserAlreadyExistsException.class)
+	public ResponseEntity<ResponseStructure<String>> handleUserAlreadyExistsException(
+	        UserAlreadyExistsException ex) {
+
+	    ResponseStructure<String> response = new ResponseStructure<>();
+
+	    response.setStatusCode(HttpStatus.CONFLICT.value());
+	    response.setMessage("Registration Failed");
+	    response.setData(ex.getMessage());
+
+	    return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+	}
+	
+	@ExceptionHandler(InvalidCredentialsException.class)
+	public ResponseEntity<ResponseStructure<String>> handleInvalidCredentialsException(
+			InvalidCredentialsException ex) {
+
+		ResponseStructure<String> response = new ResponseStructure<>();
+
+		response.setStatusCode(HttpStatus.UNAUTHORIZED.value());
+		response.setMessage("Login Failed");
+		response.setData(ex.getMessage());
+
+		return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+	}
 
 	// ===========================================================
 	// STUDENT ROLL NUMBER ALREADY EXISTS (409 Conflict)

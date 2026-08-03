@@ -35,3 +35,4 @@ public interface IssueRecordRepository extends JpaRepository<IssueRecord, Intege
             IssueStatus status
     );
 }
+
